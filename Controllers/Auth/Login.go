@@ -1,8 +1,10 @@
 package auth
 
 import (
+	"errors"
 	"log"
 	"os"
+	"regexp"
 	"time"
 
 	"go_learn/database"
@@ -13,6 +15,25 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+func validateLogin(usr models.User) error {
+	if usr.Email == "" || usr.Password == "" {
+		return errors.New("requested data cannot be empty")
+	}
+	
+	emailRegex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	re := regexp.MustCompile(emailRegex)
+
+	if !re.MatchString(usr.Email) {
+		return errors.New("invalid email format")
+	}
+
+	if len(usr.Password) < 6 {
+		return errors.New("password must be at least 6 characters long")
+	}
+
+	return nil
+}
+
 func LoginUser(c *gin.Context) {
 	var user models.User
 
@@ -21,6 +42,11 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
+	if validuser := validateLogin(user); validuser != nil {
+		c.JSON(400, gin.H{ "error" : validuser.Error() })
+		return
+	}
+	
 	var dbUser models.User
 	if err := database.DB.Where("email = ?", user.Email).First(&dbUser).Error; err != nil {
 		log.Printf("Database error: %v", err)
