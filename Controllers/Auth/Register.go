@@ -2,10 +2,10 @@ package auth
 
 import (
 	"errors"
-	"regexp"
-
 	"go_learn/database"
+	"go_learn/helpers"
 	"go_learn/models"
+	"regexp"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,8 +43,15 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+	hashedpass := helpers.HashString(user.Password)
+
+	user.Password = hashedpass
+
 	database.DB.Create(&user)
 
-	c.JSON(201, user)
+	c.JSON(201, gin.H{ 
+		"email" : user.Email,
+		"fullname" : user.Fullname,
+	})
 
 }

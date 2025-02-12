@@ -17,8 +17,9 @@ func main() {
 
     r := gin.Default()
 
-    r.POST("/api/register", auth.RegisterUser);
-
+    r.POST("/api/register", auth.RegisterUser)
+    r.POST("/api/login", auth.LoginUser)
+    
     port := ":3000"
 
     if err := r.Run(port); err != nil {
