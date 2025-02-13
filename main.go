@@ -19,6 +19,7 @@ func main() {
 
     r.POST("/api/register", auth.RegisterUser)
     r.POST("/api/login", auth.LoginUser)
+    r.POST("/api/newtoken", auth.NewAccessToken)
     
     port := ":3000"
 
