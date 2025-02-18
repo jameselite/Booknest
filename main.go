@@ -25,7 +25,8 @@ func main() {
     app.POST("/api/newbook", middlewares.AuthCheck(), books.CreateBooks)
     app.GET("/api/books", books.GetAllBooks)
     app.GET("/api/books/:id", books.GetBook)
-    app.PUT("/api/books/:id/update",middlewares.AuthCheck(), books.UpdateBook)
+    app.PUT("/api/books/:id/update", middlewares.AuthCheck(), books.UpdateBook)
+    app.DELETE("/api/books/:id/delete", middlewares.AuthCheck(), books.DeleteBook)
 
     port := ":3000"
 
