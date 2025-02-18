@@ -23,6 +23,8 @@ func main() {
     r.POST("/api/login", auth.LoginUser)
     r.POST("/api/newtoken", auth.NewAccessToken)
     r.POST("/api/newbook", middlewares.AuthCheck(), books.CreateBooks)
+    r.GET("/api/books", books.GetAllBooks)
+    r.GET("/api/books/:id", books.GetBook)
 
     port := ":3000"
 

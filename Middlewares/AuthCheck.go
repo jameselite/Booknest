@@ -45,8 +45,6 @@ func AuthCheck() gin.HandlerFunc {
 			return
 		}
 
-		fmt.Println("Extracted claims:", claims)
-
 		userClaims := make(map[string]interface{})
 
 		for key, value := range claims {

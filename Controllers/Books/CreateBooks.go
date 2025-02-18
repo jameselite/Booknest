@@ -1,17 +1,26 @@
 package books
 
 import (
-	"fmt"
+	"errors"
 	"go_learn/database"
 	"go_learn/models"
-	"log"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
 )
 
+func ValidateCreate(book models.Book) error {
+
+	if (book.Title == "" || book.Description == "" || book.BookURL == "" || book.Picture == "") {
+		return errors.New("requested data can not be empty")
+	}else {
+		return nil
+	}
+}
+
 func CreateBooks(c *gin.Context) {
+
 	var book models.Book
 
 	if err := c.ShouldBindJSON(&book); err != nil {
@@ -19,6 +28,11 @@ func CreateBooks(c *gin.Context) {
 		return
 	}
 
+	if validerr := ValidateCreate(book); validerr != nil {
+		c.JSON(400, gin.H{ "error" : validerr.Error() })
+		return
+	}
+	
 	reqclaimRaw, exists := c.Get("reqclaim")
 	if !exists {
 		c.JSON(401, gin.H{"error": "User authentication required."})
@@ -38,13 +52,11 @@ func CreateBooks(c *gin.Context) {
 	}
 	authorID := uint(idFloat)
 
-	email, emailExists := reqclaim["email"].(string)
+	_, emailExists := reqclaim["email"].(string)
 	if !emailExists {
 		c.JSON(403, gin.H{"error": "User email is missing or invalid."})
 		return
 	}
-
-	fmt.Println("Authenticated user:", authorID, email)
 
 	var user models.User
 	if err := database.DB.First(&user, authorID).Error; err != nil {
@@ -69,6 +81,5 @@ func CreateBooks(c *gin.Context) {
 		return
 	}
 
-	log.Println("New book created:", book)
 	c.JSON(201, book)
 }
